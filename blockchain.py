@@ -82,6 +82,9 @@ def validate_chain():
             return False
     return True
 
+def verify_txns():
+    return all([verify_txn(tx) for tx in open_txns])
+
 def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
 
@@ -114,6 +117,7 @@ while True:
     print('2: Mine new block')
     print('3: output blockchain blocks')
     print('4: output participants')
+    print('5: check txn validity')
     print('9: get sent amounts')
     print('10: get received amounts')
     print('h: manipulate the chain')
@@ -136,6 +140,11 @@ while True:
         print_blockchain_elements()
     elif user_choice == '4':
         print(participants)
+    elif user_choice == '5':
+        if verify_txns():
+            print('all txns are valid')
+        else:
+            print('there are invalid txns')
     elif user_choice == '9' or user_choice == '10':
         print(get_balance( 'Mo', user_choice))
     elif user_choice == 'h':
