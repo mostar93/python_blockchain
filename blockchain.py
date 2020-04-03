@@ -1,10 +1,16 @@
+from  functools import reduce
+import hashlib
+from collections import OrderedDict
+
+from hash_util import hash_string, hash_block
 
 MINING_REWARD = 10
 
 genesis_block = {
         'prev_hash': ' ', 
         'index': 0, 
-        'transactions': []
+        'transactions': [],
+        'proof': 100
     }
 blockchain = [genesis_block]
 open_txns = []
@@ -13,6 +19,21 @@ participants = {'Mo'}
 
 
 
+def valid_proof(transactions, last_hash, proof):
+    guess = (str(transactions) + str(last_hash) + str(proof)).encode()
+    guess_hash = hash_string(guess)
+    print(guess_hash)
+    return guess_hash[0:2] == '00'
+
+
+def proof_of_work():
+    last_block = blockchain[-1]
+    last_hash = hash_block(last_block)
+    proof = 0
+    while not valid_proof(open_txns, last_hash, proof):
+        proof += 1
+    return proof
+
 def get_last():
     if len(blockchain) <  1:
         return None
@@ -20,11 +41,19 @@ def get_last():
 
 
 def add_txn(recipient, sender=owner, amt=1.0):
-    transaction = {
-        'sender': sender, 
-        'recipient': recipient, 
-        'amt': amt
-    }
+    # transaction = {
+    #     'sender': sender, 
+    #     'recipient': recipient, 
+    #     'amt': amt
+    # }
+
+    transaction = OrderedDict(
+        [
+            ('sender', sender), 
+            ('recipient', recipient), 
+            ('amt', amt)
+            ]
+    )
 
     if verify_txn(transaction):
         open_txns.append(transaction)
@@ -38,17 +67,22 @@ def add_txn(recipient, sender=owner, amt=1.0):
 def mine_block():
     last_block= blockchain[-1]
     hashed_block = hash_block(last_block)
-    reward_txn = {
-        'sender': 'MINING',
-        'recipient': owner,
-        'amt': MINING_REWARD
-    }
+    proof = proof_of_work()
+
+    # reward_txn = {
+    #     'sender': 'MINING',
+    #     'recipient': owner,
+    #     'amt': MINING_REWARD
+    # }
+
+    reward_txn = OrderedDict([('sender', 'MINING'), ('recipient', owner), ('amt', MINING_REWARD)])
     copied_txns = open_txns[:]
     copied_txns.append(reward_txn)
     block = {
         'prev_hash': hashed_block, 
         'index': len(blockchain), 
-        'transactions': copied_txns
+        'transactions': copied_txns,
+        'proof': proof
     }
     blockchain.append(block)
     return True
@@ -80,13 +114,12 @@ def validate_chain():
             continue
         if block['prev_hash'] != hash_block(blockchain[index - 1]):
             return False
-    return True
+        if not valid_proof(block['transactions'][:-1], block['prev_hash'], block['proof']):
+            return False
 
-def verify_txns():
     return all([verify_txn(tx) for tx in open_txns])
 
-def hash_block(block):
-    return '-'.join([str(block[key]) for key in block])
+
 
 
 def get_balance(participant, user_choice= 'x'):
@@ -94,22 +127,20 @@ def get_balance(participant, user_choice= 'x'):
     tx_recipient = [[tx['amt'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
     open_txn_sender = [tx['amt'] for tx in open_txns if tx['sender'] == participant] 
     tx_sender.append(open_txn_sender)
-
+  
     if user_choice == '9':
         return tx_sender
     elif user_choice == '10':
         return tx_recipient
     else:
-        amount_sent = 0
-        amount_received = 0
-        for tx in tx_sender:
-            if len(tx) > 0:
-                amount_sent += tx[0]
-        for tx in tx_recipient:
-            if len(tx) > 0:
-                amount_received += tx[0]
+        amount_sent = reduce(lambda tx_sum, tx_amt: tx_sum + sum(tx_amt) if len(tx_amt) > 0 else tx_sum + 0, tx_sender, 0)
+        amount_received = reduce(lambda tx_sum, tx_amt: tx_sum + sum(tx_amt) if len(tx_amt) > 0 else tx_sum + 0, tx_recipient, 0)
+    
         return amount_received - amount_sent
-        
+
+def verify_txns():
+    """Verifies all open transactions."""
+    return all([verify_txn(tx) for tx in open_txns])      
 
 while True:
     print('Please Choose')
@@ -163,7 +194,7 @@ while True:
         print_blockchain_elements()
         print('invalid blockchain')
         break
-    print(get_balance('Mo'))
+    print('Balance of {}: {:6.2f}'.format('Mo', get_balance('Mo')))
     
 
 print('done')
