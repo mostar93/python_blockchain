@@ -20,41 +20,52 @@ owner = 'Mo'
 participants = {'Mo'}
 
 def load_data():
-    with open('blockchain.p', mode='rb') as f:
-        file_content = pickle.loads(f.read())
-        global blockchain
-        global open_txns
-        blockchain = file_content['chain']
-        open_txns = file_content['ot']
+    try:
+        with open('blockchain.p', mode='rb') as f:
+            file_content = pickle.loads(f.read())
+            global blockchain
+            global open_txns
+            blockchain = file_content['chain']
+            open_txns = file_content['ot']
 
-        ''' Below is an example of using JSON to convert data to a string, store to a file, and then reading from that file back to our blockchain
-        However, it JSON doesnt distinguish between OrderedDict and normal dict so it messes up the proof for chain validation
+            ''' Below is an example of using JSON to convert data to a string, store to a file, and then reading from that file back to our blockchain
+            However, it JSON doesnt distinguish between OrderedDict and normal dict so it messes up the proof for chain validation
 
-        Pickling does keep the OrderedDict and because it is closer to machine language (it is binary) therefore the steps required to load data is 
-        greatly reduced '''
-     
+            Pickling does keep the OrderedDict and because it is closer to machine language (it is binary) therefore the steps required to load data is 
+            greatly reduced '''
+        
 
-        # blockchain = json.loads(file_content[0][:-1])
-        # updated_blockchain = []
-        # for block in blockchain:
-        #     updated_block = {
-        #         'prev_hash': block['prev_hash'],
-        #         'index': block['index'],
-        #         'proof':block['proof'],
-        #         'transactions': [OrderedDict(
-        #     [('sender', tx['sender']), ('recipient', tx['recipient']), ('amt', tx['amt'])]) for tx in block['transactions']]
-        #     }
-        #     updated_blockchain.append(updated_block)
-        # blockchain = updated_blockchain
-        # open_txns = json.loads(file_content[1])
-        # updated_txns = []
-        # for tx in open_txns:
-        #     updated_txn = OrderedDict(
-        #     [('sender', tx['sender']), ('recipient', tx['recipient']), ('amt', tx['amt'])]) 
-        #     updated_txns.append(updated_txn)
-        # open_txns = updated_txns
+            # blockchain = json.loads(file_content[0][:-1])
+            # updated_blockchain = []
+            # for block in blockchain:
+            #     updated_block = {
+            #         'prev_hash': block['prev_hash'],
+            #         'index': block['index'],
+            #         'proof':block['proof'],
+            #         'transactions': [OrderedDict(
+            #     [('sender', tx['sender']), ('recipient', tx['recipient']), ('amt', tx['amt'])]) for tx in block['transactions']]
+            #     }
+            #     updated_blockchain.append(updated_block)
+            # blockchain = updated_blockchain
+            # open_txns = json.loads(file_content[1])
+            # updated_txns = []
+            # for tx in open_txns:
+            #     updated_txn = OrderedDict(
+            #     [('sender', tx['sender']), ('recipient', tx['recipient']), ('amt', tx['amt'])]) 
+            #     updated_txns.append(updated_txn)
+            # open_txns = updated_txns
+    except IOError:
+        print('file not found')
+    except ValueError:
+        print('there is a value error')
+    finally:
+        print('Cleanup')
+    
+
+
 
 load_data()
+
 
 
 def save_data():
