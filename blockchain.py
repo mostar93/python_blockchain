@@ -27,11 +27,11 @@ def load_data():
         blockchain = file_content['chain']
         open_txns = file_content['ot']
 
-        # Below is an example of using JSON to convert data to a string, store to a file, and then reading from that file back to our blockchain
-        # However, it JSON doesnt distinguish between OrderedDict and normal dict so it messes up the proof for chain validation
+        ''' Below is an example of using JSON to convert data to a string, store to a file, and then reading from that file back to our blockchain
+        However, it JSON doesnt distinguish between OrderedDict and normal dict so it messes up the proof for chain validation
 
-        # Pickling does keep the OrderedDict and because it is closer to machine language (it is binary) therefore the steps required to load data is 
-        #greatly reduced 
+        Pickling does keep the OrderedDict and because it is closer to machine language (it is binary) therefore the steps required to load data is 
+        greatly reduced '''
      
 
         # blockchain = json.loads(file_content[0][:-1])
