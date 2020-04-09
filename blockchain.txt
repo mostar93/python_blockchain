@@ -1,0 +1,2 @@
+[{'prev_hash': ' ', 'index': 0, 'transactions': [], 'proof': 100}, {'prev_hash': '2e9169c030ce9944f5151e00407be957d330be5b74d616ca779e2d8a0ef846e3', 'index': 1, 'transactions': [OrderedDict([('sender', 'MINING'), ('recipient', 'Mo'), ('amt', 10)])], 'proof': 85}]
+[]
