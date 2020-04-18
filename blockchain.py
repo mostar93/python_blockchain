@@ -8,23 +8,22 @@ from hash_util import hash_string, hash_block
 
 MINING_REWARD = 10
 
-genesis_block = {
-        'prev_hash': ' ', 
-        'index': 0, 
-        'transactions': [],
-        'proof': 100
-    }
-blockchain = [genesis_block]
+blockchain = []
+
 open_txns = []
+
 owner = 'Mo'
+
 participants = {'Mo'}
 
 def load_data():
+# only handle errors that you can't predict or avoid. Only wrap code that will fail in runtime. Value errors dont need to be handled usually
+    global blockchain
+    global open_txns
     try:
         with open('blockchain.p', mode='rb') as f:
             file_content = pickle.loads(f.read())
-            global blockchain
-            global open_txns
+       
             blockchain = file_content['chain']
             open_txns = file_content['ot']
 
@@ -55,9 +54,16 @@ def load_data():
             #     updated_txns.append(updated_txn)
             # open_txns = updated_txns
     except IOError:
-        print('file not found')
-    except ValueError:
-        print('there is a value error')
+        genesis_block = {
+        'prev_hash': ' ', 
+        'index': 0, 
+        'transactions': [],
+        'proof': 100
+        }
+        blockchain = [genesis_block]
+        open_txns = []
+    # except ValueError:
+    #     print('there is a value error')
     finally:
         print('Cleanup')
     
@@ -69,15 +75,18 @@ load_data()
 
 
 def save_data():
-    with open('blockchain.p', mode='wb') as f:
-        # f.write(json.dumps(blockchain))
-        # f.write('\n')
-        # f.write(json.dumps(open_txns))
-        save_data = {
-            'chain': blockchain,
-            'ot': open_txns
-        }
-        f.write(pickle.dumps(save_data))
+    try:
+        with open('blockchain.p', mode='wb') as f:
+            # f.write(json.dumps(blockchain))
+            # f.write('\n')
+            # f.write(json.dumps(open_txns))
+            save_data = {
+                'chain': blockchain,
+                'ot': open_txns
+            }
+            f.write(pickle.dumps(save_data))
+    except IOError:
+        print('Saving Failed')
 
 def valid_proof(transactions, last_hash, proof):
     guess = (str(transactions) + str(last_hash) + str(proof)).encode()
