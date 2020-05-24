@@ -1,0 +1,2 @@
+[{"index": 0, "prev_hash": "", "timestamp": 0, "txns": [], "proof": 100}, {"index": 1, "prev_hash": "0d26d05d5036d3e84cee9c1e6bff08bbf1d339d15bfadfd81ef5a00fa07121f4", "timestamp": 1590352912.034236, "txns": [{"sender": "MINING", "recipient": "Mo", "amt": 10}], "proof": 243}, {"index": 2, "prev_hash": "5cc053ac9d7971cb93e796bd5c8719429313a519eedb273eeaf4f0d9127571d4", "timestamp": 1590356983.855443, "txns": [{"sender": "MINING", "recipient": "Mo", "amt": 10}], "proof": 235}]
+[]

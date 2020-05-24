@@ -6,4 +6,6 @@ def hash_string(string):
 
 
 def hash_block(block):
-    return hash_string(json.dumps(block, sort_keys=True).encode())
+    hashable_block = block.__dict__.copy()
+    hashable_block['txns'] = [tx.to_ordered_dict() for tx in hashable_block['txns']]
+    return hash_string(json.dumps(hashable_block, sort_keys=True).encode())
